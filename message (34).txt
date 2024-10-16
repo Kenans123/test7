@@ -1,0 +1,156 @@
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.Name = "ScreenGui"
+ScreenGui.Archivable = true
+ScreenGui.DisplayOrder = 0
+ScreenGui.Enabled = true
+ScreenGui.IgnoreGuiInset = false
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.SelectionGroup = false
+
+local TextButton = Instance.new("TextButton")
+TextButton.Parent = ScreenGui
+TextButton.AnchorPoint = Vector2.new(0, 0)
+TextButton.Position = UDim2.new(0.682458401, 0, -0.0223577227, 0)
+TextButton.Name = "TextButton"
+TextButton.TextSize = 14
+TextButton.Text = "Caq.vip lock"
+TextButton.TextColor3 = Color3.fromRGB(147.00000643730164,147.00000643730164,147.00000643730164)
+TextButton.TextXAlignment = Enum.TextXAlignment.Center
+TextButton.TextYAlignment = Enum.TextYAlignment.Center
+TextButton.TextScaled = true
+TextButton.TextTruncate = Enum.TextTruncate.None
+TextButton.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+TextButton.TextStrokeTransparency = 1
+TextButton.TextTransparency = 0
+TextButton.TextWrapped = true
+TextButton.BackgroundTransparency = 0
+TextButton.BorderColor3 = Color3.fromRGB(76.0000030696392,76.0000030696392,76.0000030696392)
+TextButton.BorderMode = Enum.BorderMode.Outline
+TextButton.BackgroundColor3 = Color3.fromRGB(65.0000037252903,65.0000037252903,65.0000037252903)
+TextButton.BorderSizePixel = 4
+TextButton.Size = UDim2.new(0, 200, 0, 50)
+TextButton.SizeConstraint = Enum.SizeConstraint.RelativeXY
+TextButton.Selectable = true
+TextButton.SelectionOrder = 0
+TextButton.Font = Enum.Font.Arcade
+TextButton.RichText = true
+TextButton.Rotation = 0
+TextButton.ZIndex = 1
+TextButton.ClipsDescendants = false
+TextButton.Visible = true
+TextButton.AutomaticSize = Enum.AutomaticSize.None
+TextButton.LayoutOrder = 0
+
+local UICorner_1 = Instance.new("UICorner")
+UICorner_1.Name = "UICorner_1"
+UICorner_1.CornerRadius = UDim.new(0, 8)
+UICorner_1.Parent = TextButton
+
+local TextBox = Instance.new("TextBox")
+TextBox.Parent = ScreenGui
+TextBox.AnchorPoint = Vector2.new(0, 0)
+TextBox.Position = UDim2.new(0.682458401, 0, 0.0792682916, 0)
+TextBox.PlaceholderText = ""
+TextBox.PlaceholderColor3 = Color3.fromRGB(178.49999696016312,178.49999696016312,178.49999696016312)
+TextBox.Name = "TextBox"
+TextBox.TextSize = 14
+TextBox.Text = "Prediction:"
+TextBox.TextColor3 = Color3.fromRGB(148.000006377697,148.000006377697,148.000006377697)
+TextBox.TextXAlignment = Enum.TextXAlignment.Center
+TextBox.TextYAlignment = Enum.TextYAlignment.Center
+TextBox.TextScaled = true
+TextBox.TextTruncate = Enum.TextTruncate.None
+TextBox.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+TextBox.TextStrokeTransparency = 1
+TextBox.TextTransparency = 0
+TextBox.TextWrapped = true
+TextBox.TextEditable = true
+TextBox.BackgroundTransparency = 0
+TextBox.BorderColor3 = Color3.fromRGB(84.00000259280205,84.00000259280205,84.00000259280205)
+TextBox.BorderMode = Enum.BorderMode.Outline
+TextBox.BackgroundColor3 = Color3.fromRGB(77.00000301003456,77.00000301003456,77.00000301003456)
+TextBox.BorderSizePixel = 0
+TextBox.Size = UDim2.new(0, 127, 0, 36)
+TextBox.SizeConstraint = Enum.SizeConstraint.RelativeXY
+TextBox.Selectable = true
+TextBox.SelectionOrder = 0
+TextBox.SelectionStart = -1
+TextBox.Font = Enum.Font.Arcade
+TextBox.RichText = true
+TextBox.Rotation = 0
+TextBox.ZIndex = 1
+TextBox.ClipsDescendants = false
+TextBox.ClearTextOnFocus = true
+TextBox.CursorPosition = -1
+TextBox.Visible = true
+TextBox.AutomaticSize = Enum.AutomaticSize.None
+TextBox.LayoutOrder = 0
+TextBox.MultiLine = false
+
+local UICorner_2 = Instance.new("UICorner")
+UICorner_2.Name = "UICorner_2"
+UICorner_2.CornerRadius = UDim.new(0, 8)
+UICorner_2.Parent = TextBox
+
+getgenv().AimPart = "HumanoidRootPart"
+getgenv().AimRadius = 500
+getgenv().PredictMovement = true
+getgenv().PredictionVelocity = 6.7
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local Client = Players.LocalPlayer
+local AimlockTarget = nil
+local MousePressed = false
+
+local function getNearestTarget()
+    local nearestPlayer = nil
+    local nearestDistance = getgenv().AimRadius
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= Client and player.Character and player.Character:FindFirstChild(getgenv().AimPart) then
+            local targetPart = player.Character[getgenv().AimPart]
+            local distance = (targetPart.Position - Camera.CFrame.Position).magnitude
+            if distance < nearestDistance then
+                nearestDistance = distance
+                nearestPlayer = player
+            end
+        end
+    end
+
+    return nearestPlayer
+end
+
+TextButton.MouseButton1Click:Connect(function()
+    if not MousePressed then
+        MousePressed = true
+        AimlockTarget = getNearestTarget()
+    else
+        AimlockTarget = nil
+        MousePressed = false
+    end
+end)
+
+TextBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local predictionValue = tonumber(TextBox.Text)
+    if predictionValue then
+        getgenv().PredictionVelocity = predictionValue
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if AimlockTarget and AimlockTarget.Character then
+        local targetPart = AimlockTarget.Character:FindFirstChild(getgenv().AimPart)
+        if targetPart then
+            local targetPosition = targetPart.Position
+            if getgenv().PredictMovement then
+                targetPosition = targetPosition + targetPart.Velocity / getgenv().PredictionVelocity
+            end
+            
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetPosition)
+        end
+    end
+end)
